@@ -55,4 +55,8 @@ public class Directory extends Entry {
         }
         return totalSize;
     }
+
+    public List<Entry> getEntries() {
+        return entries;
+    }
 }
