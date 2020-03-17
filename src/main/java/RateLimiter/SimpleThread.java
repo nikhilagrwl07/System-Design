@@ -6,14 +6,14 @@ public class SimpleThread extends Thread {
 
     private RedisService redisService;
 
-    public SimpleThread(String str, int rateLimitPerMinute) {
+    public SimpleThread(String str, RedisService rs) {
         super(str);
-        redisService = new RedisService(rateLimitPerMinute);
+        this.redisService = rs;
     }
 
     public void run() {
         for (int i = 1; i <= 70; i++) {
-            System.out.println(i + " " + hit("user 1", Instant.now()));
+            System.out.println("Thread Name - " + getName() + " Time - " + i + " " + hit(getName(), Instant.now()));
             try {
                 sleep(1000);
             } catch (InterruptedException e) {

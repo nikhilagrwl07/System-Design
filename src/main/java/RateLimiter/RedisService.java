@@ -2,9 +2,9 @@ package RateLimiter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RedisService {
 
@@ -15,21 +15,23 @@ public class RedisService {
     }
 
     // User name to request count mapping for lazy loading
-    private Map<String, Integer> userIdToRequestCount = new HashMap<>();
+    private Map<String, Integer> userIdToRequestCount = new ConcurrentHashMap<>();
 
     // User name to request mapping for storing requests for each user
-    private Map<String, LinkedList<Request>> userIdToRequest = new HashMap<>();
+    private Map<String, LinkedList<Request>> userIdToRequest = new ConcurrentHashMap<>();
 
     public boolean addNewUser(String userName, Instant requestedTs) {
         LinkedList<Request> requests = new LinkedList<>();
         requests.add(new Request(requestedTs, 1));
         userIdToRequest.put(userName, requests);
         userIdToRequestCount.put(userName, 1);
+        System.out.println("New User !!! - " + userName);
         return true;
     }
 
     public boolean requestHit(String userName, Instant ts) {
-        if (!userIdToRequest.containsKey(userName)) {
+
+        if (!userIdToRequestCount.containsKey(userName)) {
             return addNewUser(userName, ts);
         } else {
             if (userIdToRequestCount.get(userName) < rateLimitPerMinute) {
@@ -53,6 +55,7 @@ public class RedisService {
                 }
 
                 // case 1 - if some entries are older than 1 minute evict those and insert new entry
+                // and return true
                 if (actionTaken) {
                     LinkedList<Request> tmp = userIdToRequest.get(userName);
                     tmp.add(new Request(ts, 1));
@@ -63,7 +66,7 @@ public class RedisService {
                 }
 
                 // case 2 - if all entries are within 1 minute,
-                // then rate has been breached and then return false
+                // then rate has been breached and return false
                 return false;
             }
         }
