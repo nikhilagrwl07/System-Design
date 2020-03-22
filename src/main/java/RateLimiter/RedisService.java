@@ -14,9 +14,6 @@ public class RedisService {
         rateLimitPerMinute = rpm;
     }
 
-    // User name to request count mapping for lazy loading
-    private Map<String, Integer> userIdToRequestCount = new ConcurrentHashMap<>();
-
     // User name to request mapping for storing requests for each user
     private Map<String, LinkedList<Request>> userIdToRequest = new ConcurrentHashMap<>();
 
@@ -24,22 +21,19 @@ public class RedisService {
         LinkedList<Request> requests = new LinkedList<>();
         requests.add(new Request(requestedTs, 1));
         userIdToRequest.put(userName, requests);
-        userIdToRequestCount.put(userName, 1);
         System.out.println("New User !!! - " + userName);
         return true;
     }
 
-    public boolean requestHit(String userName, Instant ts) {
+    public synchronized boolean requestHit(String userName, Instant ts) {
 
-        if (!userIdToRequestCount.containsKey(userName)) {
+        if (!userIdToRequest.containsKey(userName)) {
             return addNewUser(userName, ts);
         } else {
-            if (userIdToRequestCount.get(userName) < rateLimitPerMinute) {
+            if (getTotalElapsedRequest(userName) < rateLimitPerMinute) {
                 LinkedList<Request> tmp = userIdToRequest.get(userName);
                 tmp.add(new Request(ts, 1));
                 userIdToRequest.put(userName, tmp);
-
-                userIdToRequestCount.put(userName, userIdToRequestCount.get(userName) + 1);
                 return true;
             } else {
                 boolean actionTaken = false;
@@ -47,7 +41,6 @@ public class RedisService {
                     Duration duration = Duration.between(userIdToRequest.get(userName).get(i).getTs(), ts);
                     if (duration.getSeconds() >= 60) {
                         userIdToRequest.get(userName).remove(i);
-                        userIdToRequestCount.put(userName, userIdToRequestCount.get(userName) - 1);
                         actionTaken = true;
                     } else {
                         break;
@@ -60,8 +53,6 @@ public class RedisService {
                     LinkedList<Request> tmp = userIdToRequest.get(userName);
                     tmp.add(new Request(ts, 1));
                     userIdToRequest.put(userName, tmp);
-
-                    userIdToRequestCount.put(userName, userIdToRequestCount.get(userName) + 1);
                     return true;
                 }
 
@@ -70,6 +61,10 @@ public class RedisService {
                 return false;
             }
         }
+    }
+
+    private int getTotalElapsedRequest(String userName) {
+        return userIdToRequest.get(userName).stream().mapToInt(Request::getCount).sum();
     }
 }
 
