@@ -1,8 +1,9 @@
 Requirement
+
 Track of flights based on their 
-    - departure time 
-    - arrival times
-    - flight path(Source, destination for now)
+   - departure time 
+   - arrival times
+   - flight path(Source, destination for now)
 
 Primary Use Case
    - Return list of flight when user searches by following queries
@@ -11,7 +12,7 @@ Primary Use Case
        - flight path(Source, destination for now)
 
 Objects
-    - Flight
-    - Query params 
+   - Flight
+   - Query params 
 
-Reponsibility between Object/Service
+Responsibility between Object/Service
