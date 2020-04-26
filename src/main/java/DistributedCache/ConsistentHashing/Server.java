@@ -1,4 +1,4 @@
-package ConsistentHashing;
+package DistributedCache.ConsistentHashing;
 
 import java.util.ArrayList;
 import java.util.List;

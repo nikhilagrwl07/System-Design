@@ -1,4 +1,4 @@
-package ConsistentHashing;
+package DistributedCache.ConsistentHashing;
 
 public class Entry<K, V> {
     private K key;

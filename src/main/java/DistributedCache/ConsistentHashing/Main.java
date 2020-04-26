@@ -1,4 +1,4 @@
-package ConsistentHashing;
+package DistributedCache.ConsistentHashing;
 
 public class Main {
     public static void main(String[] args) {
