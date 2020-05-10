@@ -2,41 +2,43 @@ package FileAndDirectorySystem.search;
 
 import FileAndDirectorySystem.Directory;
 import FileAndDirectorySystem.Entry;
+import FileAndDirectorySystem.File;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SearchByFileName implements SearchCriteria {
 
-    // Assuming top level provided data is directory (not file)
-    private Directory directory;
-
-    public SearchByFileName(Directory directory) {
-        this.directory = directory;
-    }
-
     @Override
-    public SearchResponse search(String value) {
-        return search(value, directory);
+    public SearchResponse search(SearchRequest searchRequest , List<Entry> entries) {
+        SearchResponse searchResponse = new SearchResponse(new ArrayList<>());
+        search(searchRequest.getPattern(), entries, searchResponse);
+        return searchResponse;
     }
 
-    public SearchResponse search(String fileName, Directory path) {
-        for (Entry e : path.getEntries()) {
+    public void search(String fileName, List<Entry> entries, SearchResponse searchResponse) {
 
+        for (Entry e : entries) {
             if (e instanceof Directory) {
-                // searching within directory
-                SearchResponse searchResult = search(fileName, (Directory) e);
-
-                if (!searchResult.getStatusCode().equalsIgnoreCase( "404")) {
-                    return searchResult;
+                for(Entry en : ((Directory) e).getEntries()){
+                    if(en instanceof File){
+                        if(en.getName().startsWith(fileName)){
+                            searchResponse.getResult().add(en);
+                        }
+                    }
+                    else{
+                        search(fileName, Collections.singletonList(en), searchResponse);
+                    }
                 }
             }
             else{
-
                 if(e.getName().equalsIgnoreCase(fileName)){
-                    return new SearchResponse(Arrays.asList(e), "200");
+                    searchResponse.getResult().add(e);
                 }
             }
         }
-        return new SearchResponse(null, "404");
     }
 }

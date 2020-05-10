@@ -3,7 +3,11 @@ package FileAndDirectorySystem;
 public class File extends Entry {
     private String content;
     private String format;
-    private Integer size;
+
+    public File(String name, Double size) {
+        super.setName(name);
+        super.setSize(size);
+    }
 
     public String getContent() {
         return content;
@@ -13,7 +17,4 @@ public class File extends Entry {
         return format;
     }
 
-    public Integer getSize() {
-        return size;
-    }
 }

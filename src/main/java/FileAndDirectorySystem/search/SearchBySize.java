@@ -2,28 +2,39 @@ package FileAndDirectorySystem.search;
 
 import FileAndDirectorySystem.Directory;
 import FileAndDirectorySystem.Entry;
+import FileAndDirectorySystem.File;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SearchBySize implements SearchCriteria {
 
-    // Assuming top level provided data is directory (not file)
-    private Directory directory;
-
-    public SearchBySize(Directory directory) {
-        this.directory = directory;
-    }
-
     @Override
-    public SearchResponse search(String value) {
-        return search(value, directory);
+    public SearchResponse search(SearchRequest searchRequest, List<Entry> entries) {
+        SearchResponse searchResponse = new SearchResponse(new ArrayList<>());
+        search(searchRequest.getMinSize(), entries, searchResponse);
+        return searchResponse;
     }
 
-    public SearchResponse search(String fileName, Directory path) {
-        for (Entry e : path.getEntries()) {
+    public void search(Double minSize, List<Entry> entries, SearchResponse searchResponse) {
 
-            // add code stub here
+        for (Entry e : entries) {
+            if (e instanceof Directory) {
+                for (Entry en : ((Directory) e).getEntries()) {
+                    if (en instanceof File) {
+                        if (en.getSize() >= minSize) {
+                            searchResponse.getResult().add(en);
+                        }
+                    } else {
+                        search(minSize, Collections.singletonList(en), searchResponse);
+                    }
+                }
+            } else {
+                if (e.getSize()>=minSize) {
+                    searchResponse.getResult().add(e);
+                }
+            }
         }
-        return new SearchResponse(null, "404");
     }
 }

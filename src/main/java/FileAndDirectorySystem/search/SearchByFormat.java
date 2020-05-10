@@ -2,26 +2,33 @@ package FileAndDirectorySystem.search;
 
 import FileAndDirectorySystem.Directory;
 import FileAndDirectorySystem.Entry;
+import FileAndDirectorySystem.File;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SearchByFormat implements SearchCriteria {
 
-    // Assuming top level provided data is directory (not file)
-    private Directory directory;
-
-    public SearchByFormat(Directory directory) {
-        this.directory = directory;
-    }
-
     @Override
-    public SearchResponse search(String value) {
-        return search(value, directory);
+    public SearchResponse search(SearchRequest searchRequest, List<Entry> entries) {
+        SearchResponse searchResponse = new SearchResponse(new ArrayList<>());
+        search(searchRequest.getPattern(), entries, searchResponse);
+        return searchResponse;
     }
 
-    public SearchResponse search(String fileName, Directory path) {
-        for (Entry e : path.getEntries()) {
+    public void search(String format, List<Entry> entries, SearchResponse searchResponse) {
+        for (Entry e : entries) {
 
-            // add code stub here
+            if (e instanceof Directory) {
+                // searching within directory
+                search(format, Collections.singletonList(e), searchResponse);
+            } else {
+                File f = (File) e;
+                if (f.getFormat().endsWith(format)) {
+                    searchResponse.getResult().add(e);
+                }
+            }
         }
-        return new SearchResponse(null, "404");
     }
 }
