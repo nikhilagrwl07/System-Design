@@ -12,7 +12,7 @@ public class MainDriver {
         MainDriver ob = new MainDriver();
 
         List<Entry> entries = buildFileSystem();
-        SearchRequest searchRequest = new SearchRequest(31d,"F");
+        SearchRequest searchRequest = new SearchRequest(31d,"F", "xlsx");
 
         ApplySearchFilter applySearchFilter = new ApplySearchFilter();
         SearchResponse searchResponse = applySearchFilter.search(searchRequest, entries);
@@ -27,11 +27,11 @@ public class MainDriver {
     //              F4.txt 40
     //              F5.xlsx 50
     private static List<Entry> buildFileSystem() {
-        File F1 = new File("F1.csv", 10d);
-        File F2 = new File("F2.ppt", 20d);
-        File F3 = new File("F3.txt", 30d);
-        File F4 = new File("F4.txt", 40d);
-        File F5 = new File("F5.xlsx", 50d);
+        File F1 = new File("F1", 10d, "csv");
+        File F2 = new File("F2", 20d, "ppt");
+        File F3 = new File("F3", 30d, "txt");
+        File F4 = new File("F4", 40d, "txt");
+        File F5 = new File("F5", 50d, "xlsx");
 
         Directory d2 = new Directory();
         d2.add(F4);

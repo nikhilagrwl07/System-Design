@@ -15,6 +15,9 @@ public class SearchByFileName implements SearchCriteria {
     @Override
     public SearchResponse search(SearchRequest searchRequest , List<Entry> entries) {
         SearchResponse searchResponse = new SearchResponse(new ArrayList<>());
+        if(searchRequest.getPattern()==null)
+            return searchResponse;
+
         search(searchRequest.getPattern(), entries, searchResponse);
         return searchResponse;
     }

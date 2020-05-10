@@ -13,6 +13,9 @@ public class SearchBySize implements SearchCriteria {
     @Override
     public SearchResponse search(SearchRequest searchRequest, List<Entry> entries) {
         SearchResponse searchResponse = new SearchResponse(new ArrayList<>());
+        if(searchRequest.getMinSize()==null)
+            return searchResponse;
+
         search(searchRequest.getMinSize(), entries, searchResponse);
         return searchResponse;
     }

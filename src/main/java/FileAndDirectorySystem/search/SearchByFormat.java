@@ -13,19 +13,26 @@ public class SearchByFormat implements SearchCriteria {
     @Override
     public SearchResponse search(SearchRequest searchRequest, List<Entry> entries) {
         SearchResponse searchResponse = new SearchResponse(new ArrayList<>());
-        search(searchRequest.getPattern(), entries, searchResponse);
+        if(searchRequest.getFormat()==null)
+            return searchResponse;
+        search(searchRequest.getFormat(), entries, searchResponse);
         return searchResponse;
     }
 
     public void search(String format, List<Entry> entries, SearchResponse searchResponse) {
         for (Entry e : entries) {
-
             if (e instanceof Directory) {
-                // searching within directory
-                search(format, Collections.singletonList(e), searchResponse);
+                for (Entry en : ((Directory) e).getEntries()) {
+                    if (en instanceof File) {
+                        if (((File) en).getFormat().endsWith(format)) {
+                            searchResponse.getResult().add(en);
+                        }
+                    } else {
+                        search(format, Collections.singletonList(en), searchResponse);
+                    }
+                }
             } else {
-                File f = (File) e;
-                if (f.getFormat().endsWith(format)) {
+                if (((File) e).getFormat().endsWith(format)) {
                     searchResponse.getResult().add(e);
                 }
             }

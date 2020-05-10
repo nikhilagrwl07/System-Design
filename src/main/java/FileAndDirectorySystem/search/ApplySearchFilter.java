@@ -1,9 +1,7 @@
 package FileAndDirectorySystem.search;
 
-import FileAndDirectorySystem.Directory;
 import FileAndDirectorySystem.Entry;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ApplySearchFilter implements SearchCriteria {
@@ -20,21 +18,9 @@ public class ApplySearchFilter implements SearchCriteria {
 
     @Override
     public SearchResponse search(SearchRequest searchRequest, List<Entry> entries) {
-        SearchResponse searchResponse = null;
-
-        if(searchRequest.getPattern()!=null){
-            searchResponse =searchByFileName.search(searchRequest, entries);
-        }
-
-        if(searchRequest.getMinSize()!=null){
-            if(searchResponse!=null){
-                searchResponse =searchBySize.search(searchRequest, searchResponse.getResult());
-            }
-            else{
-                searchResponse =searchBySize.search(searchRequest, entries);
-            }
-        }
-
+        SearchResponse searchResponse = searchByFileName.search(searchRequest, entries);
+        searchResponse = searchBySize.search(searchRequest, searchResponse != null ? searchResponse.getResult() : entries);
+        searchResponse = searchByFormat.search(searchRequest, searchResponse != null ? searchResponse.getResult() : entries);
         return searchResponse;
     }
 }
