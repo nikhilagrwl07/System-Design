@@ -37,6 +37,7 @@ Responsibility of objects
 
 Interaction between objects
 
-- Start writing some above classes 
-
+- Start writing some above classes
+  
+![alt text](Hotel Booking System Design.png)
   
